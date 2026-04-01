@@ -155,11 +155,15 @@ Gather the three files specified earlier along with [riscv_test.ipynb](riscv_tes
 
 #### [12] Running on the Pynq Board
 
+Check this post https://piazza.com/class/mjxdf87xmug4h3/post/140
+
 Launch [riscv_test.ipynb](riscv_test.ipynb) within the designated Jupyter notebook environment and execute the code. The address 0x20 corresponds to `out1` and 0x30 to `out2`. The value at `out1` will continuously change, reflecting the cycle count, whereas the value at `out2` will display the static value from the 10th register.
 
 *Please include a screenshot of the Jupyter notebook displaying the output in your report.* 
 
 ### Step-3: Deploy on the Pynq Board (Workaround)
+
+Check this post https://piazza.com/class/mjxdf87xmug4h3/post/140
 
 #### [13] SSH test and upload the file (This is just for uploading the files)
 
