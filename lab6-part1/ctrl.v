@@ -14,12 +14,30 @@ module ctrl #(
     output [COLS-1:0] stream_out_rdy
 );
 
-    //TODO: Signal declarations
+    // Column 0 receives the signals immediately
+    assign rst_accumulator[0] = input_rst_accumulator;
+    assign stream_out_rdy[0]  = input_stream_out_rdy;
 
-
-
-    //TODO: Rst and stream out rdy signal propagation and synchronization logic among different MAC units
-
-
+    // Subsequent columns receive signals delayed by 1 cycle per column
+    genvar i;
+    generate
+        for (i = 1; i < COLS; i = i + 1) begin : shift_gen
+            reg rst_acc_delay_reg;
+            reg stream_rdy_delay_reg;
+            
+            always @(posedge clk) begin
+                if (rst) begin
+                    rst_acc_delay_reg    <= 1'b0;
+                    stream_rdy_delay_reg <= 1'b0;
+                end else begin
+                    rst_acc_delay_reg    <= rst_accumulator[i-1];
+                    stream_rdy_delay_reg <= stream_out_rdy[i-1];
+                end
+            end
+            
+            assign rst_accumulator[i] = rst_acc_delay_reg;
+            assign stream_out_rdy[i]  = stream_rdy_delay_reg;
+        end
+    endgenerate
 
 endmodule
