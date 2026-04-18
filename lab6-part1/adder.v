@@ -125,8 +125,8 @@ module adder#(
             assign done = en_reg && ~reset;
         end
         else begin
-            reg [OUTPUT_WIDTH-1:0] add_delayed[0:DELAY-2];
-            reg en_delayed[0:DELAY-2];
+            reg [OUTPUT_WIDTH-1:0] add_delayed[0:DELAY-1];
+            reg en_delayed[0:DELAY-1];
             //sync with add
             always @(posedge clk ) begin
                 if (reset) begin
@@ -135,7 +135,7 @@ module adder#(
                     en_reg <= (stall) ? en_reg : en;
                 end
             end
-            for (i = 0; i < DELAY-1; i = i + 1) begin
+            for (i = 0; i < DELAY; i = i + 1) begin
                 if (i == 0) begin
                     always @(posedge clk ) begin
                         if (reset) begin
@@ -159,8 +159,8 @@ module adder#(
                     end
                 end
             end
-            assign out = add_delayed[DELAY-2];
-            assign done = en_delayed[DELAY-2] && ~reset;
+            assign out = add_delayed[DELAY-1];
+            assign done = en_delayed[DELAY-1] && ~reset;
         end
     endgenerate
 
