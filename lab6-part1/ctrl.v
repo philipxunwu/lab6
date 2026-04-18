@@ -19,6 +19,7 @@ module ctrl #(
     assign stream_out_rdy[0]  = input_stream_out_rdy;
 
     // Subsequent columns receive signals delayed by MULT_LAT cycles per column
+    genvar i;
     generate
         for (i = 1; i < COLS; i = i + 1) begin : shift_gen
             reg [MULT_LAT-1:0] rst_acc_delay_reg;
