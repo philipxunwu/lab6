@@ -17,7 +17,7 @@ module mac #(
     input                      stream_out_rdy_in,
     input       [IN_WIDTH-1:0] row_data_in,
     input       [IN_WIDTH-1:0] col_data_in,
-    input       [IN_WIDTH-1:0] bypass_data_in, 
+    input       [OUT_WIDTH-1:0] bypass_data_in, 
     output reg  [IN_WIDTH-1:0] row_data_out,
     output reg  [IN_WIDTH-1:0] col_data_out,
     output reg                 rst_accumulator_out,
@@ -53,9 +53,9 @@ module mac #(
         end
     end
 
-    // Tap the delay line at MULT_LAT-1 to sync with the multiplier output
-    wire delayed_rst    = (MULT_LAT > 0) ? rst_acc_delay[MULT_LAT-1] : rst_accumulator_in;
-    wire delayed_stream = (MULT_LAT > 0) ? stream_rdy_delay[MULT_LAT-1] : stream_out_rdy_in;
+    // Tap the delay line at MULT_LAT to sync with the multiplier output
+    wire delayed_rst    = (MULT_LAT > 0) ? rst_acc_delay[MULT_LAT] : rst_accumulator_in;
+    wire delayed_stream = (MULT_LAT > 0) ? stream_rdy_delay[MULT_LAT] : stream_out_rdy_in;
 
     // Multiplier Instantiation
     multiplier #(
