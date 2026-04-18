@@ -75,9 +75,10 @@ module mac #(
     );
 
     // Adder Routing Logic:
+    // If reset: Add 0 + 0 to reset accumulator.
     // If streaming: Add bypass_data_in + 0 to shift it to add_out next cycle.
     // If compute: Add mult_out + add_out (accumulate) OR mult_out + 0 (if reset).
-    wire [OUT_WIDTH-1:0] adder_a = delayed_stream ? bypass_data_in : mult_out;
+    wire [OUT_WIDTH-1:0] adder_a = delayed_rst ? {OUT_WIDTH{1'b0}} : (delayed_stream ? bypass_data_in : mult_out);
     wire [OUT_WIDTH-1:0] adder_b = (delayed_stream || delayed_rst) ? {OUT_WIDTH{1'b0}} : add_out;
 
     // Adder Instantiation
