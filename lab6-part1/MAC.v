@@ -27,15 +27,58 @@ module mac #(
 
 
     //TODO: Signal declarations
-    
+
+    reg [OUT_WIDTH-1:0] accumulator; 
+    reg [IN_WIDTH-1:0] row_data_reg; 
+    reg [IN_WIDTH-1:0] col_data_reg; 
+    reg [IN_WIDTH-1:0] bypass_data_reg; 
+    reg stream_out_rdy_reg; 
+    reg rst_accumulator_reg; 
+
+    wire signed [OUT_WIDTH-1:0] mult_out;
+    wire mult_done;
+    wire signed [OUT_WIDTH-1:0] add_out;
+    wire add_done; 
 
 
     //TODO: multiplier instantiation
-
-
-
+    multiplier #(
+        .INPUT_A_WIDTH(IN_WIDTH),
+        .INPUT_B_WIDTH(IN_WIDTH),
+        .INPUT_A_FRAC(IN_FRAC),
+        .INPUT_B_FRAC(IN_FRAC),
+        .OUTPUT_WIDTH(OUT_WIDTH),
+        .OUTPUT_FRAC(OUT_FRAC),
+        .DELAY(MULT_LAT)
+    ) mult_inst (
+        .clk(clk),
+        .reset(rst),
+        .en(1'b1),
+        .stall(1'b0),
+        .a_in(row_data_in),
+        .b_in(col_data_in),
+        .out(mult_out),
+        .done(mult_done)
+    );
     //TODO: adder instantiation
-
+    adder #(
+        .INPUT_A_WIDTH(OUT_WIDTH),
+        .INPUT_B_WIDTH(OUT_WIDTH),
+        .INPUT_A_FRAC(OUT_FRAC),
+        .INPUT_B_FRAC(OUT_FRAC),
+        .OUTPUT_WIDTH(OUT_WIDTH),
+        .OUTPUT_FRAC(OUT_FRAC),
+        .DELAY(1)
+    ) add_inst (
+        .clk(clk),
+        .reset(rst),
+        .en(mult_done),
+        .stall(1'b0),
+        .a_in(mult_out),
+        .b_in(accumulator),
+        .out(add_out),
+        .done(add_done)
+    );
 
 
     //TODO: signal propagation and synchronization
@@ -44,6 +87,29 @@ module mac #(
     // 2. An important part of the following design is to figure out how the data from multipliers and adders should be paired with the above two control signals
     // 3. Mainly you need to know: should I pass the results of this very own MAC's accumulator to the next MAC's accumulator or should I pass the results of the previous MAC's accumulator to this MAC's accumulator and when to do so
     // 4. Also, when should be the exact time point to reset the accumulator so my current results will not be cleared by mistake and the next matrix multiplication can start cleanly.
+
+    row_data_reg <= row_data_in; 
+    col_data_reg <= col_data_in; 
+    bypass_data_reg <= bypass_data_in; 
+
+    row_data_out <= row_data_reg; 
+    col_data_out <= col_data_reg;
+
+    rst_accumulator_out <= rst_accumulator_reg; 
+    stream_out_rdy_out <= stream_out_rdy_reg;
+
+    // take from adder for output
+    // take from multipler for accumulator 
+    if (stream_out_rdy_in & rst_accumulator_in) begin 
+        stream_out_rdy_reg <= stream_out_rdy_in; 
+        rst_accumulator_reg <= rst_accumulator_in; 
+        psum_out <= mult_out; 
+        accumulator <= add_out; 
+    end 
+    if (bypass_data_in) begin 
+        psum_out <= bypass_data_reg; 
+    end
+
 
 
 endmodule

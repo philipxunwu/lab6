@@ -4,7 +4,8 @@ module ctrl #(
     parameter ROWS = 4,
     parameter COLS = 4,
     parameter MULT_LAT = 1,
-    parameter ACC_LAT = 1
+    parameter ACC_LAT = 1, 
+    parameter K = 4 
 )(
     input clk,
     input rst,
@@ -16,9 +17,28 @@ module ctrl #(
 
     //TODO: Signal declarations
 
+    reg [31:0] counter;
+
 
 
     //TODO: Rst and stream out rdy signal propagation and synchronization logic among different MAC units
+
+    always @(posedge clk) begin
+        if (rst) begin
+            counter <= 0;
+        end else begin
+            counter <= counter + 1;
+        end
+    end
+
+    genvar i;
+    generate
+        for (i = 0; i < COLS; i = i + 1) begin : ctrl_gen
+            localparam START_CYCLE = MULT_LAT + ACC_LAT - 1 + (COLS - 1 - i);
+            assign rst_accumulator[i] = (counter >= START_CYCLE) && ((counter - START_CYCLE) % K == 0);
+            assign stream_out_rdy[i] = (counter >= START_CYCLE) && ((counter - START_CYCLE) % K == 0);
+        end
+    endgenerate
 
 
 
