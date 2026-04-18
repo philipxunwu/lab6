@@ -240,10 +240,10 @@ module systolic_array #(
         end
     endgenerate
 
-    // Map internal partial sums from the last column to the final output
+    // Map leftmost partial sums to the final output
     generate
         for (genvar r = 0; r < ROWS; r = r + 1) begin : output_assign
-            assign row_data_out[r*OUT_WIDTH +: OUT_WIDTH] = psum[r][COLS-1];
+            assign row_data_out[r*OUT_WIDTH +: OUT_WIDTH] = psum[r][0];
         end
     endgenerate
 
